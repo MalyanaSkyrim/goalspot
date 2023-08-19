@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Node 18",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2021",
+    "lib": ["es2021"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noEmit": true,
+    "preserveWatchOutput": true,
+    "outDir": "./build/",
+    "rootDir": "."
+  },
+  "include": ["./src/", "./tsup.config.ts"],
+  "exclude": ["**/node_modules", "**/.*/"]
+}

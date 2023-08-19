@@ -3,5 +3,19 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
-  "cSpell.words": ["clsx", "hookform", "rneui", "tailwindcss"]
+  "cSpell.words": [
+    "autoload",
+    "backoff",
+    "clsx",
+    "fastify",
+    "fileoverview",
+    "hookform",
+    "MALYANA",
+    "nativewind",
+    "pino",
+    "rneui",
+    "tailwindcss",
+    "tsup",
+    "typecheck"
+  ]
 }
