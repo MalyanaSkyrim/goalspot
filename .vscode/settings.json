@@ -3,5 +3,5 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
-  "cSpell.words": ["clsx", "rneui"]
+  "cSpell.words": ["clsx", "hookform", "rneui", "tailwindcss"]
 }
