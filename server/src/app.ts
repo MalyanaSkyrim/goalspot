@@ -1,15 +1,14 @@
-import fs from "fs";
-
-import { createServer, generateSwaggerDocs, ServerOptions } from "./server";
+import { createServer } from "./server";
+require("dotenv").config();
 
 const port = process.env.PORT || 3001;
 
-const prodConfig: ServerOptions = {
+const prodConfig = {
   disableRequestLogging: true,
   bodyLimit: 20000000,
 };
 
-export const devConfig: ServerOptions = {
+export const devConfig = {
   disableRequestLogging: true,
   bodyLimit: 20000000,
   logger: {
@@ -23,7 +22,6 @@ export const devConfig: ServerOptions = {
       },
     },
   },
-  isDocPrivate: true,
 };
 
 const server = createServer(
@@ -39,24 +37,6 @@ const start = async () => {
   } catch (err) {
     server.log.error(err);
     process.exit(1);
-  }
-
-  try {
-    // check we're running in a docker container
-    if (process.env.NODE_ENV === "development") {
-      const isDocker =
-        // cspell:disable-next-line
-        fs.access("/.dockerenv", fs.constants.F_OK, (err) =>
-          server.log.info(
-            `Service ${err ? "isn't" : "is"} running in a Docker container`
-          )
-        ) !== null;
-      if (!isDocker) {
-        generateSwaggerDocs(server, true);
-      }
-    }
-  } catch (error) {
-    server.log.error(error);
   }
 };
 
