@@ -1,8 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+import { sendOTPCode, verifyOTPCode } from "../../services/twilio";
 import { Context } from "../../trpc/context";
-import { RegisterInput, SignInInput } from "./auth.schema";
+import { RegisterInput, SignInInput, VerifyOTPInput } from "./auth.schema";
 
 export const signIn = async ({
   ctx,
@@ -41,7 +43,7 @@ export const register = async ({
   ctx: Context;
 }) => {
   const hashedPassword = await bcrypt.hash(input.password, 10);
-  console.log("### sky", { hashedPassword });
+  await sendOTPCode(input.phone);
   return ctx.db.user
     .create({
       data: { ...input, password: hashedPassword },
@@ -54,4 +56,13 @@ export const register = async ({
       },
     })
     .catch((err) => console.log(err));
+};
+
+export const verifyOTP = ({
+  input,
+}: {
+  input: VerifyOTPInput;
+  ctx: Context;
+}) => {
+  return verifyOTPCode(input.phone, input.code);
 };

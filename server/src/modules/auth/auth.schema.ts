@@ -12,5 +12,11 @@ export const registerSchema = z.object({
   phone: z.string(),
 });
 
+export const verifyOTPSchema = z.object({
+  phone: z.string(),
+  code: z.string().min(6),
+});
+
 export type SignInInput = z.infer<typeof signInSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type VerifyOTPInput = z.infer<typeof verifyOTPSchema>;

@@ -1,5 +1,7 @@
+import { config } from "dotenv";
 import { createServer } from "./server";
-require("dotenv").config();
+
+config();
 
 const port = process.env.PORT || 3001;
 
