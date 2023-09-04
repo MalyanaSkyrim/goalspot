@@ -2,9 +2,14 @@ import { TRPCError } from "@trpc/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import { sendOTPCode, verifyOTPCode } from "../../services/twilio";
+import { verifyOTPCode } from "../../services/twilio";
 import { Context } from "../../trpc/context";
-import { RegisterInput, SignInInput, VerifyOTPInput } from "./auth.schema";
+import {
+  RegisterInput,
+  RenewTokenSchemaInput,
+  SignInInput,
+  VerifyOTPInput,
+} from "./auth.schema";
 
 export const signIn = async ({
   ctx,
@@ -26,13 +31,18 @@ export const signIn = async ({
       message: "Invalid credentials",
     });
 
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     { name: user.name, email: user.email, type: user.type },
-    process.env.SECRET,
+    process.env.ACCESS_SECRET,
     { expiresIn: "1d" }
   );
 
-  return { token };
+  const refreshToken = jwt.sign(
+    { name: user.name, email: user.email, type: user.type },
+    process.env.REFRESH_SECRET
+  );
+
+  return { accessToken, refreshToken };
 };
 
 export const register = async ({
@@ -43,19 +53,30 @@ export const register = async ({
   ctx: Context;
 }) => {
   const hashedPassword = await bcrypt.hash(input.password, 10);
-  await sendOTPCode(input.phone);
-  return ctx.db.user
-    .create({
-      data: { ...input, password: hashedPassword },
-      select: {
-        name: true,
-        active: true,
-        type: true,
-        phone: true,
-        email: true,
-      },
-    })
-    .catch((err) => console.log(err));
+  // await sendOTPCode(input.phone);
+  const user = await ctx.db.user.create({
+    data: { ...input, password: hashedPassword },
+    select: {
+      name: true,
+      active: true,
+      type: true,
+      phone: true,
+      email: true,
+    },
+  });
+
+  const accessToken = jwt.sign(
+    { name: user.name, email: user.email, type: user.type },
+    process.env.ACCESS_SECRET,
+    { expiresIn: "1d" }
+  );
+
+  const refreshToken = jwt.sign(
+    { name: user.name, email: user.email, type: user.type },
+    process.env.REFRESH_SECRET
+  );
+
+  return { accessToken, refreshToken, user };
 };
 
 export const verifyOTP = ({
@@ -65,4 +86,24 @@ export const verifyOTP = ({
   ctx: Context;
 }) => {
   return verifyOTPCode(input.phone, input.code);
+};
+
+export const renewToken = ({
+  input,
+}: {
+  input: RenewTokenSchemaInput;
+  ctx: Context;
+}) => {
+  try {
+    const decoded = jwt.verify(input.refreshToken, process.env.REFRESH_SECRET);
+    const accessToken = jwt.sign(decoded, process.env.ACCESS_SECRET, {
+      expiresIn: "1d",
+    });
+    return { accessToken };
+  } catch (err) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "refresh token is invalid",
+    });
+  }
 };

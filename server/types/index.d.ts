@@ -2,7 +2,8 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       DATABASE: string;
-      SECRET: string;
+      ACCESS_SECRET: string;
+      REFRESH_SECRET: string;
       PORT?: number;
       NODE_ENV: "development" | "production";
       TWILIO_ACCOUNT_SID: string;
