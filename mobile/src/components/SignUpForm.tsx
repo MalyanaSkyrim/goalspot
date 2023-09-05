@@ -2,11 +2,16 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import React from 'react';
 import {useForm} from 'react-hook-form';
 import {Text, TouchableHighlight, View} from 'react-native';
+import {ScreenProps} from '../types/navigation';
 import FormInput from '../ui/Form/FormInput';
 import classMerge from '../utils/classMerge';
 import {SignUpData, signUpSchema} from '../utils/validation/auth';
 
-const SignUpForm = () => {
+const SignUpForm = ({
+  navigation,
+}: {
+  navigation: ScreenProps<'Auth'>['navigation'];
+}) => {
   const {control, handleSubmit, formState} = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
   });

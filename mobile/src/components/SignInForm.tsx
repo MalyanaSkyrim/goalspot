@@ -1,17 +1,40 @@
 import {zodResolver} from '@hookform/resolvers/zod';
+import {useAtom} from 'jotai';
 import React from 'react';
 import {useForm} from 'react-hook-form';
 import {Text, TouchableHighlight, View} from 'react-native';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import {isAuthenticatedAtom} from '../jotai/atoms';
+import {ScreenProps} from '../types/navigation';
 import FormInput from '../ui/Form/FormInput';
+import trpc from '../utils/trpc';
 import {SignInData, signInSchema} from '../utils/validation/auth';
 
-const SignInForm = () => {
+const SignInForm = ({
+  navigation,
+}: {
+  navigation: ScreenProps<'Auth'>['navigation'];
+}) => {
   const {control, handleSubmit} = useForm<SignInData>({
     resolver: zodResolver(signInSchema),
   });
 
+  const [, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
+
+  const {mutate: signIn} = trpc.auth.signIn.useMutation();
+
   const onSubmit = (data: SignInData) => {
-    console.log('sky', {data});
+    signIn(data, {
+      async onSuccess(res) {
+        const {accessToken, refreshToken} = res;
+        await EncryptedStorage.setItem('accessToken', accessToken);
+        await EncryptedStorage.setItem('refreshToken', refreshToken);
+        setIsAuthenticated(true);
+      },
+      onError(err) {
+        console.log('### sky Error', {err});
+      },
+    });
   };
   return (
     <View className="space-y-5">
@@ -28,7 +51,7 @@ const SignInForm = () => {
       </View>
       <View className="space-y-6">
         <View>
-          <FormInput control={control} name="username" placeholder="Username" />
+          <FormInput control={control} name="email" placeholder="Email" />
           <FormInput control={control} name="password" placeholder="Password" />
         </View>
         <TouchableHighlight

@@ -15,6 +15,7 @@
     "pino",
     "rneui",
     "tailwindcss",
+    "tanstack",
     "trpc",
     "tsup",
     "typecheck"

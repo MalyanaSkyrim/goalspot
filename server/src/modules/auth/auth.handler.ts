@@ -17,7 +17,7 @@ export const signIn = async ({
 }: {
   input: SignInInput;
   ctx: Context;
-}) => {
+}): Promise<{ accessToken: string; refreshToken: string }> => {
   const { email, password } = input;
   const user = await ctx.db.user.findUnique({ where: { email } });
   if (!user)

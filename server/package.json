@@ -29,7 +29,7 @@
     "@fastify/sensible": "^5.2.0",
     "@fastify/swagger": "^8.3.1",
     "@prisma/client": "5.2.0",
-    "@trpc/server": "^10.38.0",
+    "@trpc/server": "^10.38.1",
     "bcrypt": "^5.1.0",
     "currency.js": "^2.0.4",
     "date-fns": "^2.30.0",
