@@ -1,3 +1,4 @@
+import parsePhoneNumber from 'libphonenumber-js';
 import {z} from 'zod';
 
 export const signInSchema = z.object({
@@ -6,9 +7,13 @@ export const signInSchema = z.object({
 });
 
 export const signUpSchema = z.object({
-  username: z.string().min(3),
+  name: z.string().min(3),
   email: z.string().email(),
-  phone: z.string(),
+  phone: z
+    .string()
+    .transform(val => parsePhoneNumber(val))
+    .refine(arg => !arg || arg.isValid(), 'Phone number is invalid')
+    .transform(val => val!.number.toString()),
   password: z.string().min(8),
 });
 

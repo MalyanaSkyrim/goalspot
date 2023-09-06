@@ -11,6 +11,7 @@ export const getUser = ({
   return ctx.db.user.findUnique({
     where: { id: input.id },
     select: {
+      id: true,
       name: true,
       active: true,
       type: true,

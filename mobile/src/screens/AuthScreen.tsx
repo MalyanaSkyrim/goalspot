@@ -1,42 +1,19 @@
 import {TabView} from '@rneui/base';
 import {Tab} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
-import {
-  ImageBackground,
-  Keyboard,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import {ImageBackground, TouchableWithoutFeedback, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import SignInForm from '../components/SignInForm';
 import SignUpForm from '../components/SignUpForm';
+import useKeyboardVisible from '../hooks/useKeyboardVisible';
 import {ScreenProps} from '../types/navigation';
 import classMerge from '../utils/classMerge';
 
 const AuthScreen = ({navigation}: ScreenProps<'Auth'>) => {
   const [index, setIndex] = useState(0);
 
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [isKeyboardVisible] = useKeyboardVisible();
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true); // or some other action
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false); // or some other action
-      },
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
   return (
     <View className="relative flex-1">
       <ImageBackground

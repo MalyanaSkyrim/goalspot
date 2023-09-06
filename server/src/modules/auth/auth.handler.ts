@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import { User } from "@prisma/client";
 import { verifyOTPCode } from "../../services/twilio";
 import { Context } from "../../trpc/context";
 import {
@@ -51,12 +52,17 @@ export const register = async ({
 }: {
   input: RegisterInput;
   ctx: Context;
-}) => {
+}): Promise<{
+  accessToken: string;
+  refreshToken: string;
+  user: Omit<User, "password">;
+}> => {
   const hashedPassword = await bcrypt.hash(input.password, 10);
   // await sendOTPCode(input.phone);
   const user = await ctx.db.user.create({
     data: { ...input, password: hashedPassword },
     select: {
+      id: true,
       name: true,
       active: true,
       type: true,

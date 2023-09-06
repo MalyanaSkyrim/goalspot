@@ -12,6 +12,8 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {isAuthenticatedAtom} from './src/jotai/atoms';
 import AuthScreen from './src/screens/AuthScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import OTPScreen from './src/screens/OTPScreen';
+import PhoneNumberEditScreen from './src/screens/PhoneNumberEditScreen';
 import {RootStackParamList} from './src/types/navigation';
 import trpc from './src/utils/trpc';
 const Stack = createStackNavigator<RootStackParamList>();
@@ -51,7 +53,14 @@ function App(): JSX.Element {
               header: () => null,
             }}>
             {isAuthenticated ? (
-              <Stack.Screen name="Home" component={HomeScreen} />
+              <>
+                <Stack.Screen name="OTP" component={OTPScreen} />
+                <Stack.Screen
+                  name="PhoneEdit"
+                  component={PhoneNumberEditScreen}
+                />
+                <Stack.Screen name="Home" component={HomeScreen} />
+              </>
             ) : (
               <Stack.Screen name="Auth" component={AuthScreen} />
             )}

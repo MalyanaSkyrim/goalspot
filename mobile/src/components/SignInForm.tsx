@@ -31,9 +31,6 @@ const SignInForm = ({
         await EncryptedStorage.setItem('refreshToken', refreshToken);
         setIsAuthenticated(true);
       },
-      onError(err) {
-        console.log('### sky Error', {err});
-      },
     });
   };
   return (
@@ -55,6 +52,7 @@ const SignInForm = ({
           <FormInput control={control} name="password" placeholder="Password" />
         </View>
         <TouchableHighlight
+          underlayColor="#727272"
           className="bg-neutral-400 justify-center items-center rounded-md py-2"
           onPress={handleSubmit(onSubmit)}>
           <Text className="uppercase text-white">Continue</Text>
