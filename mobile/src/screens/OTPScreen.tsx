@@ -18,14 +18,14 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
   const [resendCount, setResendCount] = useState(0);
   const [timeToResend, setTimeToResend] = useState(0);
 
-  const phone = route.params?.phoneNumber || '+212622304207';
+  const phoneNumber = route.params?.phoneNumber || '+212622304207';
 
   const {mutate: verifyOTP, error, reset} = trpc.auth.verifyOTP.useMutation();
 
   const validateOtp = () => {
-    if (code && phone)
+    if (code && phoneNumber)
       verifyOTP(
-        {code, phone},
+        {code, phone: phoneNumber},
         {
           onSuccess() {
             navigation.navigate('Home');
@@ -50,7 +50,7 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
   };
 
   const navigateToPhoneNumberEditScreen = () => {
-    navigation.navigate('PhoneEdit');
+    navigation.navigate('PhoneEdit', {phoneNumber});
   };
   const resendOtpCode = () => {
     setResendCount(resendCount + 1);
@@ -79,7 +79,7 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
               </Text>
               <Text className="text-neutral-300 text-lg mt-4">
                 We've sent a verification code to{' '}
-                <Text className="font-bold">{phone}</Text>
+                <Text className="font-bold">{phoneNumber}</Text>
               </Text>
               <TouchableOpacity
                 className="flex-row items-center space-x-1 mt-2"

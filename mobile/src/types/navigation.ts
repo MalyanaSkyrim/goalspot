@@ -4,7 +4,7 @@ export type RootStackParamList = {
   Home: undefined;
   Auth: undefined;
   OTP: {phoneNumber: string};
-  PhoneEdit: undefined;
+  PhoneEdit: {phoneNumber: string};
 };
 
 export type ScreenProps<Route extends keyof RootStackParamList> =

@@ -1,4 +1,5 @@
 import {zodResolver} from '@hookform/resolvers/zod';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAtom} from 'jotai';
 import React from 'react';
 import {useForm} from 'react-hook-form';
@@ -26,9 +27,10 @@ const SignInForm = ({
   const onSubmit = (data: SignInData) => {
     signIn(data, {
       async onSuccess(res) {
-        const {accessToken, refreshToken} = res;
+        const {user, accessToken, refreshToken} = res;
         await EncryptedStorage.setItem('accessToken', accessToken);
         await EncryptedStorage.setItem('refreshToken', refreshToken);
+        await AsyncStorage.setItem('user', JSON.stringify(user));
         setIsAuthenticated(true);
       },
     });

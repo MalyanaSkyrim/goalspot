@@ -18,7 +18,11 @@ export const signIn = async ({
 }: {
   input: SignInInput;
   ctx: Context;
-}): Promise<{ accessToken: string; refreshToken: string }> => {
+}): Promise<{
+  user: Omit<User, "password">;
+  accessToken: string;
+  refreshToken: string;
+}> => {
   const { email, password } = input;
   const user = await ctx.db.user.findUnique({ where: { email } });
   if (!user)
@@ -43,7 +47,18 @@ export const signIn = async ({
     process.env.REFRESH_SECRET
   );
 
-  return { accessToken, refreshToken };
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      type: user.type,
+      active: user.active,
+      phone: user.phone,
+    },
+    accessToken,
+    refreshToken,
+  };
 };
 
 export const register = async ({
