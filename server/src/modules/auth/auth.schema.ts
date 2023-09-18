@@ -13,8 +13,13 @@ export const registerSchema = z.object({
 });
 
 export const verifyOTPSchema = z.object({
+  id: z.string().uuid(),
   phone: z.string(),
   code: z.string().min(6),
+});
+
+export const sendOTPSchema = z.object({
+  phone: z.string(),
 });
 
 export const renewTokenSchema = z.object({
@@ -24,4 +29,5 @@ export const renewTokenSchema = z.object({
 export type SignInInput = z.infer<typeof signInSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type VerifyOTPInput = z.infer<typeof verifyOTPSchema>;
+export type SendOtpInput = z.infer<typeof sendOTPSchema>;
 export type RenewTokenSchemaInput = z.infer<typeof renewTokenSchema>;

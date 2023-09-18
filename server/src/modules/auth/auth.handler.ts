@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { User } from "@prisma/client";
-import { verifyOTPCode } from "../../services/twilio";
+import { sendOTPCode, verifyOTPCode } from "../../services/twilio";
 import { Context } from "../../trpc/context";
 import {
   RegisterInput,
   RenewTokenSchemaInput,
+  SendOtpInput,
   SignInInput,
   VerifyOTPInput,
 } from "./auth.schema";
@@ -102,11 +103,16 @@ export const register = async ({
 
 export const verifyOTP = ({
   input,
+  ctx,
 }: {
   input: VerifyOTPInput;
   ctx: Context;
 }) => {
-  return verifyOTPCode(input.phone, input.code);
+  const { id, phone, code } = input;
+  return verifyOTPCode(phone, code).then(async (res) => {
+    await ctx.db.user.update({ where: { id }, data: { active: true } });
+    return res;
+  });
 };
 
 export const renewToken = ({
@@ -114,7 +120,7 @@ export const renewToken = ({
 }: {
   input: RenewTokenSchemaInput;
   ctx: Context;
-}) => {
+}): { accessToken: string } => {
   try {
     const decoded = jwt.verify(input.refreshToken, process.env.REFRESH_SECRET);
     const accessToken = jwt.sign(decoded, process.env.ACCESS_SECRET, {
@@ -127,4 +133,8 @@ export const renewToken = ({
       message: "refresh token is invalid",
     });
   }
+};
+
+export const sendOtp = ({ input }: { input: SendOtpInput }) => {
+  return sendOTPCode(input.phone);
 };

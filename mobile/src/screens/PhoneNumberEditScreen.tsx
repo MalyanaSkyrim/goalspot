@@ -5,7 +5,6 @@ import {useForm} from 'react-hook-form';
 import {ImageBackground, KeyboardAvoidingView, Text, View} from 'react-native';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import LinearGradient from 'react-native-linear-gradient';
-import useKeyboardVisible from '../hooks/useKeyboardVisible';
 import {ScreenProps} from '../types/navigation';
 import FormPhoneInput from '../ui/Form/FormPhoneInput';
 import classMerge from '../utils/classMerge';
@@ -19,25 +18,21 @@ const PhoneNumberEditScreen = ({
   navigation,
   route,
 }: ScreenProps<'PhoneEdit'>) => {
-  const phoneNumber = route.params.phoneNumber;
-  const [isKeyboardVisible] = useKeyboardVisible();
-  const {control, handleSubmit, formState} = useForm<UpdatePhoneNumberData>({
+  const phoneNumber = route.params?.phoneNumber;
+
+  const {control, handleSubmit} = useForm<UpdatePhoneNumberData>({
     resolver: zodResolver(updatePhoneNumberSchema),
   });
 
-  const {mutate: updateUser} = trpc.user.updateUser.useMutation();
+  const {mutateAsync: sendOtp} = trpc.auth.sendOtp.useMutation();
+  const {mutateAsync: updateUser} = trpc.user.updateUser.useMutation();
 
   const onSubmit = async (data: UpdatePhoneNumberData) => {
-    const userData = await AsyncStorage.getItem('user');
-    const user = userData ? JSON.parse(userData) : null;
-    updateUser(
-      {id: user.id, data},
-      {
-        onSuccess() {
-          navigation.navigate('OTP', {phoneNumber: data.phone});
-        },
-      },
-    );
+    const userId = await AsyncStorage.getItem('userId');
+    if (!userId) return;
+    await updateUser({id: userId, data});
+    await sendOtp({phone: data.phone});
+    navigation.navigate('OTP', {phoneNumber: data.phone});
   };
 
   const cancel = () => {

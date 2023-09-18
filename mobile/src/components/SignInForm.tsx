@@ -22,7 +22,7 @@ const SignInForm = ({
 
   const [, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
 
-  const {mutate: signIn} = trpc.auth.signIn.useMutation();
+  const {mutate: signIn, error} = trpc.auth.signIn.useMutation();
 
   const onSubmit = (data: SignInData) => {
     signIn(data, {
@@ -30,13 +30,19 @@ const SignInForm = ({
         const {user, accessToken, refreshToken} = res;
         await EncryptedStorage.setItem('accessToken', accessToken);
         await EncryptedStorage.setItem('refreshToken', refreshToken);
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem('userId', user.id);
         setIsAuthenticated(true);
       },
     });
   };
   return (
-    <View className="space-y-5">
+    <View className="relative space-y-5">
+      {error && (
+        <View className="bg-danger-600 p-2 rounded opacity-80">
+          <Text className="text-white">Invalid credentials</Text>
+        </View>
+      )}
+
       <View className="space-y-2">
         <Text className="text-white font-semibold text-lg">Welcome back!</Text>
         <View>
@@ -51,7 +57,12 @@ const SignInForm = ({
       <View className="space-y-6">
         <View>
           <FormInput control={control} name="email" placeholder="Email" />
-          <FormInput control={control} name="password" placeholder="Password" />
+          <FormInput
+            control={control}
+            name="password"
+            placeholder="Password"
+            secureTextEntry={true}
+          />
         </View>
         <TouchableHighlight
           underlayColor="#727272"

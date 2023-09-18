@@ -23,6 +23,7 @@ const FormPhoneInput = <
       render={({field, fieldState}) => (
         <View className={classMerge('mb-3', fieldState.error && 'mb-[2px]')}>
           <PhoneInput
+            defaultCode="MA"
             onChangeFormattedText={field.onChange}
             value={(field.value || '').toString()}
             placeholder={placeholder}

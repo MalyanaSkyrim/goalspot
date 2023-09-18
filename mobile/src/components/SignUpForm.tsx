@@ -32,7 +32,7 @@ const SignUpForm = ({
         const {user, accessToken, refreshToken} = res;
         await EncryptedStorage.setItem('accessToken', accessToken);
         await EncryptedStorage.setItem('refreshToken', refreshToken);
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem('userId', user.id);
         setIsAuthenticated(true);
         navigation.navigate('OTP', {
           phoneNumber: data.phone,
@@ -55,7 +55,12 @@ const SignUpForm = ({
             name="phone"
             placeholder="Phone number"
           />
-          <FormInput control={control} name="password" placeholder="Password" />
+          <FormInput
+            control={control}
+            name="password"
+            placeholder="Password"
+            secureTextEntry={true}
+          />
         </View>
         <TouchableHighlight
           underlayColor="#727272"

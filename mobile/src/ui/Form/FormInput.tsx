@@ -14,6 +14,7 @@ const FormInput = <TData extends Record<string, string | number | undefined>>({
   name,
   placeholder,
   style,
+  ...restProps
 }: FormInputProps<TData>) => {
   return (
     <Controller
@@ -28,6 +29,7 @@ const FormInput = <TData extends Record<string, string | number | undefined>>({
             value={(field.value || '').toString()}
             placeholder={placeholder}
             className="bg-white w-full rounded-md px-2 py-1"
+            {...restProps}
           />
           {fieldState.error?.message && (
             <Text className="text-sm text-red-400">

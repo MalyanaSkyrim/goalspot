@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {format} from 'date-fns';
 import React, {useEffect, useState} from 'react';
 import {ImageBackground, Text, TouchableOpacity, View} from 'react-native';
@@ -18,20 +19,24 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
   const [resendCount, setResendCount] = useState(0);
   const [timeToResend, setTimeToResend] = useState(0);
 
-  const phoneNumber = route.params?.phoneNumber || '+212622304207';
+  const phoneNumber = route.params?.phoneNumber;
 
   const {mutate: verifyOTP, error, reset} = trpc.auth.verifyOTP.useMutation();
 
-  const validateOtp = () => {
-    if (code && phoneNumber)
+  const validateOtp = async () => {
+    if (code && phoneNumber) {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) return;
+
       verifyOTP(
-        {code, phone: phoneNumber},
+        {id: userId, code, phone: phoneNumber},
         {
           onSuccess() {
             navigation.navigate('Home');
           },
         },
       );
+    }
   };
 
   useEffect(() => {
