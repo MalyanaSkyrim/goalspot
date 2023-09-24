@@ -10,10 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 enum UserTypeEnum {
   pitchOwner
   player
   admin
+}
+
+enum SurfaceTypeEnum {
+  asphalt
+  naturalGrass
+  syntheticGrass
 }
 
 model User {
@@ -23,5 +33,51 @@ model User {
   phone         String
   password      String
   active        Boolean            @default(false) 
-  type          UserTypeEnum?      
+  type          UserTypeEnum? 
+  pitches       Pitch[]
+  schedules     Schedule[]     
+}
+
+model Pitch {
+  id              String    @id @default(uuid())
+  name            String
+  images          PitchImage[]
+  hasBall         Boolean
+  hasShower       Boolean
+  hasShirts       Boolean
+  hasReferee      Boolean
+  maxTeamPlayers  Int
+  userId          String
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  surfaceType     SurfaceTypeEnum
+  location        PitchLocation?   @relation(fields: [locationId], references: [id])
+  locationId      String?          @unique
+  schedules       Schedule[]
+  pricePerHour    Int
+}
+
+model PitchLocation {
+  id          String  @id @default(uuid())
+  latitude    Int
+  longitude   Int
+  address     String
+  pitch       Pitch?
+}
+
+model PitchImage {
+  id        String   @id @default(uuid())
+  url       String
+  pitchId   String
+  pitch     Pitch   @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+}
+
+model Schedule {
+  id        String   @id @default(uuid())
+  date      DateTime
+  duration  Int     //Hours
+  weekly    Boolean //default false
+  userId    String
+  pitchId   String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pitch     Pitch   @relation(fields: [pitchId], references: [id], onDelete: Cascade)
 }

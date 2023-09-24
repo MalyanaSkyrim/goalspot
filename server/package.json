@@ -20,7 +20,8 @@
     "esbuild-plugin-pino": "^1.2.8",
     "eslint": "^8.32.0",
     "pino": "^8.14.1",
-    "pino-pretty": "^9.1.1"
+    "pino-pretty": "^9.1.1",
+    "prisma-dbml-generator": "^0.10.0"
   },
   "dependencies": {
     "@fastify/auth": "^4.2.0",
