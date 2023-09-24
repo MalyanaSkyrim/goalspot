@@ -1,5 +1,4 @@
 import {zodResolver} from '@hookform/resolvers/zod';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 import {useForm} from 'react-hook-form';
 import {ImageBackground, KeyboardAvoidingView, Text, View} from 'react-native';
@@ -25,12 +24,10 @@ const PhoneNumberEditScreen = ({
   });
 
   const {mutateAsync: sendOtp} = trpc.auth.sendOtp.useMutation();
-  const {mutateAsync: updateUser} = trpc.user.updateUser.useMutation();
+  const {mutateAsync: updateOwnUser} = trpc.user.updateOwnUser.useMutation();
 
   const onSubmit = async (data: UpdatePhoneNumberData) => {
-    const userId = await AsyncStorage.getItem('userId');
-    if (!userId) return;
-    await updateUser({id: userId, data});
+    await updateOwnUser(data);
     await sendOtp({phone: data.phone});
     navigation.navigate('OTP', {phoneNumber: data.phone});
   };

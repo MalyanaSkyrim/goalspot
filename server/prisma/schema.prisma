@@ -23,5 +23,5 @@ model User {
   phone         String
   password      String
   active        Boolean            @default(false) 
-  type          UserTypeEnum       @default(player)
+  type          UserTypeEnum?      
 }

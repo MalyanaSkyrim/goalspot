@@ -1,5 +1,5 @@
 import { Context } from "../../trpc/context";
-import { GetUserInput, UpdateUserInput } from "./user.schema";
+import { GetUserInput, UpdateOwnUser, UpdateUserInput } from "./user.schema";
 
 export const getUser = ({
   ctx,
@@ -29,4 +29,15 @@ export const updateUser = ({
   input: UpdateUserInput;
 }) => {
   return ctx.db.user.update({ where: { id: input.id }, data: input.data });
+};
+
+export const updateOwnUser = ({
+  ctx,
+  input,
+}: {
+  ctx: Context;
+  input: UpdateOwnUser;
+}) => {
+  const userId = ctx.req.userId;
+  return ctx.db.user.update({ where: { id: userId }, data: input });
 };

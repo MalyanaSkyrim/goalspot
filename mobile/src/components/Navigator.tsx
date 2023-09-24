@@ -9,6 +9,7 @@ import AuthScreen from '../screens/AuthScreen';
 import HomeScreen from '../screens/HomeScreen';
 import OTPScreen from '../screens/OTPScreen';
 import PhoneNumberEditScreen from '../screens/PhoneNumberEditScreen';
+import UserTypeScreen from '../screens/UserTypeScreen';
 import {RootStackParamList} from '../types/navigation';
 import trpc from '../utils/trpc';
 
@@ -60,6 +61,9 @@ const Navigator = () => {
                   component={PhoneNumberEditScreen}
                 />
               </>
+            )}
+            {!user?.type && (
+              <Stack.Screen name="UserType" component={UserTypeScreen} />
             )}
             <Stack.Screen name="Home" component={HomeScreen} />
           </>

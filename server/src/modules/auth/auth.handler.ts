@@ -38,7 +38,7 @@ export const signIn = async ({
     });
 
   const accessToken = jwt.sign(
-    { name: user.name, email: user.email, type: user.type },
+    { id: user.id, name: user.name, email: user.email, type: user.type },
     process.env.ACCESS_SECRET,
     { expiresIn: "1d" }
   );
@@ -88,7 +88,7 @@ export const register = async ({
   });
 
   const accessToken = jwt.sign(
-    { name: user.name, email: user.email, type: user.type },
+    { id: user.id, name: user.name, email: user.email, type: user.type },
     process.env.ACCESS_SECRET,
     { expiresIn: "1d" }
   );

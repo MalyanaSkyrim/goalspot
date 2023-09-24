@@ -20,7 +20,13 @@ const getRefreshToken = () => {
 };
 
 const fetchJwtPairByRefreshToken = (refreshToken: string) => {
-  return trpcProxyClient.auth.renewToken.mutate({refreshToken});
+  return trpcProxyClient.auth.renewToken
+    .mutate({refreshToken})
+    .catch(async err => {
+      await EncryptedStorage.removeItem('refreshToken');
+      await EncryptedStorage.removeItem('accessToken');
+      throw err;
+    });
 };
 const onAccessTokenFetched = (accessToken: string) => {
   return EncryptedStorage.setItem('accessToken', accessToken);
