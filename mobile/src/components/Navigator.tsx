@@ -25,6 +25,14 @@ const Navigator = () => {
     },
     {
       enabled: !!userId,
+      initialData: {
+        id: 'azdadzdzd',
+        name: 'Mohamed',
+        email: 'm@m.mm',
+        type: 'pitchOwner',
+        active: true,
+        phone: '+212622304207',
+      },
     },
   );
 
@@ -37,7 +45,7 @@ const Navigator = () => {
     if (user) setUser(user);
 
     const accessToken = await EncryptedStorage.getItem('accessToken');
-    setIsAuthenticated(!!accessToken);
+    // setIsAuthenticated(!!accessToken);
   }, [user]);
 
   useEffect(() => {

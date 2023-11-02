@@ -80,6 +80,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        //for react-native-image-crop-picke
+        vectorDrawables.useSupportLibrary = true
     }
     signingConfigs {
         debug {
