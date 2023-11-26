@@ -8,6 +8,7 @@
     "dev": "tsx watch --clear-screen=false src/app.ts",
     "build": "tsup",
     "start": "node build/app.js",
+    "db:studio": "prisma studio --port 5556",
     "typecheck": "tsc"
   },
   "keywords": [],

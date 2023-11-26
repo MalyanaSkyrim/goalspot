@@ -23,6 +23,8 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
 
   const {mutate: verifyOTP, error, reset} = trpc.auth.verifyOTP.useMutation();
 
+  const {mutateAsync: resendOtp} = trpc.auth.sendOtp.useMutation();
+
   const validateOtp = async () => {
     if (code && phoneNumber) {
       const userId = await AsyncStorage.getItem('userId');
@@ -32,7 +34,7 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
         {id: userId, code, phone: phoneNumber},
         {
           onSuccess() {
-            navigation.navigate('Home');
+            navigation.navigate('CreateField');
           },
         },
       );
@@ -58,8 +60,12 @@ const OTPScreen = ({navigation, route}: ScreenProps<'OTP'>) => {
     navigation.navigate('PhoneEdit', {phoneNumber});
   };
   const resendOtpCode = () => {
-    setResendCount(resendCount + 1);
-    setTimeToResend(30 * (resendCount + 1));
+    resendOtp({
+      phone: phoneNumber,
+    }).then(() => {
+      setResendCount(resendCount + 1);
+      setTimeToResend(30 * (resendCount + 1));
+    });
   };
 
   const codeInvalid = !code || code.length < 6;

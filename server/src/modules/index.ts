@@ -1,7 +1,8 @@
 import { formatDuration, intervalToDuration } from "date-fns";
 import { t } from "../trpc";
-import { authRouter } from "./auth/auth.router";
-import { userRouter } from "./user/user.router";
+import authRouter from "./auth/auth.router";
+import fieldRouter from "./field/field.router";
+import userRouter from "./user/user.router";
 
 function getReadableUptime() {
   const uptime = process.uptime();
@@ -21,6 +22,7 @@ export const appRouter = t.router({
 
   auth: authRouter,
   user: userRouter,
+  field: fieldRouter,
 });
 
 // export type definition of API

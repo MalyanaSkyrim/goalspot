@@ -6,7 +6,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {isAuthenticatedAtom, userAtom} from '../jotai/atoms';
 import AuthScreen from '../screens/AuthScreen';
-import HomeScreen from '../screens/HomeScreen';
+
+import CreateFieldScreen from '../screens/CreateFieldScreen';
+import EditFieldImagesScreen from '../screens/EditFieldImagesScreen';
+import {LoadingScreen} from '../screens/LoadingScreen';
 import OTPScreen from '../screens/OTPScreen';
 import PhoneNumberEditScreen from '../screens/PhoneNumberEditScreen';
 import UserTypeScreen from '../screens/UserTypeScreen';
@@ -16,42 +19,42 @@ import trpc from '../utils/trpc';
 const Stack = createStackNavigator<RootStackParamList>();
 
 const Navigator = () => {
+  const [user, setUser] = useAtom(userAtom);
   const [userId, setUserId] = useState<string>();
+
   const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
-  const [_, setUser] = useAtom(userAtom);
-  const {data: user} = trpc.user.getUser.useQuery(
+  const {data: userData, isLoading} = trpc.user.getUser.useQuery(
     {
       id: userId!,
     },
     {
-      enabled: !!userId,
-      initialData: {
-        id: 'azdadzdzd',
-        name: 'Mohamed',
-        email: 'm@m.mm',
-        type: 'pitchOwner',
-        active: true,
-        phone: '+212622304207',
-      },
+      enabled: !!(userId && !user),
     },
   );
 
   const initUserId = useCallback(async () => {
-    const userId = await AsyncStorage.getItem('userId');
-    if (userId) setUserId(userId);
+    const savedUserId = await AsyncStorage.getItem('userId');
+    if (savedUserId) setUserId(savedUserId);
   }, [userId]);
 
   const initUser = useCallback(async () => {
-    if (user) setUser(user);
+    if (userData && isAuthenticated) setUser(userData);
 
     const accessToken = await EncryptedStorage.getItem('accessToken');
-    // setIsAuthenticated(!!accessToken);
-  }, [user]);
+    setIsAuthenticated(!!accessToken);
+  }, [isAuthenticated, userData]);
 
   useEffect(() => {
+    //DevOnly: to clear storage
+    // EncryptedStorage.clear();
+    // AsyncStorage.clear();
+
     initUserId();
+  }, []);
+
+  useEffect(() => {
     initUser();
-  }, [initUser, initUserId]);
+  }, [initUser]);
 
   return (
     <NavigationContainer>
@@ -59,9 +62,10 @@ const Navigator = () => {
         screenOptions={{
           header: () => null,
         }}>
-        {isAuthenticated ? (
+        {isLoading && <Stack.Screen name="Loading" component={LoadingScreen} />}
+        {isAuthenticated && user ? (
           <>
-            {!user?.active && (
+            {!user.active && (
               <>
                 <Stack.Screen name="OTP" component={OTPScreen} />
                 <Stack.Screen
@@ -70,10 +74,14 @@ const Navigator = () => {
                 />
               </>
             )}
-            {!user?.type && (
+            {!user.type && (
               <Stack.Screen name="UserType" component={UserTypeScreen} />
             )}
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen
+              name="EditFieldImages"
+              component={EditFieldImagesScreen}
+            />
+            <Stack.Screen name="CreateField" component={CreateFieldScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />

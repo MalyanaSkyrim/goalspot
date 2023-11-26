@@ -74,9 +74,11 @@ export const register = async ({
   user: Omit<User, "password">;
 }> => {
   const hashedPassword = await bcrypt.hash(input.password, 10);
+  //DevOnly
   // await sendOTPCode(input.phone);
+  //active should be false
   const user = await ctx.db.user.create({
-    data: { ...input, password: hashedPassword },
+    data: { ...input, password: hashedPassword, active: true },
     select: {
       id: true,
       name: true,

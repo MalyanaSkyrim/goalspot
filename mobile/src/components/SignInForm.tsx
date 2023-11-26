@@ -5,7 +5,7 @@ import React from 'react';
 import {useForm} from 'react-hook-form';
 import {Text, TouchableHighlight, View} from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {isAuthenticatedAtom} from '../jotai/atoms';
+import {isAuthenticatedAtom, userAtom} from '../jotai/atoms';
 import {ScreenProps} from '../types/navigation';
 import FormInput from '../ui/Form/FormInput';
 import trpc from '../utils/trpc';
@@ -21,6 +21,7 @@ const SignInForm = ({
   });
 
   const [, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [, setUser] = useAtom(userAtom);
 
   const {mutate: signIn, error} = trpc.auth.signIn.useMutation();
 
@@ -31,6 +32,7 @@ const SignInForm = ({
         await EncryptedStorage.setItem('accessToken', accessToken);
         await EncryptedStorage.setItem('refreshToken', refreshToken);
         await AsyncStorage.setItem('userId', user.id);
+        setUser(user);
         setIsAuthenticated(true);
       },
     });
@@ -55,7 +57,7 @@ const SignInForm = ({
         </View>
       </View>
       <View className="space-y-6">
-        <View>
+        <View className="space-y-4">
           <FormInput control={control} name="email" placeholder="Email" />
           <FormInput
             control={control}

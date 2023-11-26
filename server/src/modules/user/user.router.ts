@@ -7,10 +7,12 @@ import {
   updateUserSchema,
 } from "./user.schema";
 
-export const userRouter = t.router({
+const userRouter = t.router({
   getUser: authProcedure.input(getUserSchema).query(getUser),
   updateUser: authProcedure.input(updateUserSchema).mutation(updateUser),
   updateOwnUser: authProcedure
     .input(updateOwnUserSchema)
     .mutation(updateOwnUser),
 });
+
+export default userRouter;

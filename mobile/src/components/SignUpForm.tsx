@@ -5,7 +5,7 @@ import React from 'react';
 import {useForm} from 'react-hook-form';
 import {Text, TouchableHighlight, View} from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {isAuthenticatedAtom} from '../jotai/atoms';
+import {isAuthenticatedAtom, userAtom} from '../jotai/atoms';
 import {ScreenProps} from '../types/navigation';
 import FormInput from '../ui/Form/FormInput';
 import FormPhoneInput from '../ui/Form/FormPhoneInput';
@@ -22,7 +22,10 @@ const SignUpForm = ({
     resolver: zodResolver(signUpSchema),
   });
 
+  const formHasErrors = Object.keys(formState.errors).length > 0;
+
   const [, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [, setUser] = useAtom(userAtom);
 
   const {mutate: register} = trpc.auth.register.useMutation();
 
@@ -34,6 +37,7 @@ const SignUpForm = ({
         await EncryptedStorage.setItem('refreshToken', refreshToken);
         await AsyncStorage.setItem('userId', user.id);
         setIsAuthenticated(true);
+        setUser(user);
         navigation.navigate('OTP', {
           phoneNumber: data.phone,
         });
@@ -42,12 +46,10 @@ const SignUpForm = ({
   };
 
   return (
-    <View
-      className={classMerge('space-y-5', !formState.isValid && 'space-y-1')}>
+    <View className={classMerge('space-y-5', formHasErrors && 'space-y-1')}>
       <Text className="text-white font-semibold text-lg">Create account</Text>
-      <View
-        className={classMerge('space-y-6', !formState.isValid && 'space-y-1')}>
-        <View>
+      <View>
+        <View className={classMerge('space-y-4', formHasErrors && 'space-y-1')}>
           <FormInput control={control} name="name" placeholder="Name" />
           <FormInput control={control} name="email" placeholder="Email" />
           <FormPhoneInput
@@ -62,12 +64,17 @@ const SignUpForm = ({
             secureTextEntry={true}
           />
         </View>
-        <TouchableHighlight
-          underlayColor="#727272"
-          className="bg-neutral-400 justify-center items-center rounded-md py-2"
-          onPress={handleSubmit(onSubmit)}>
-          <Text className="uppercase text-white">Continue</Text>
-        </TouchableHighlight>
+        <View className="mt-6">
+          <TouchableHighlight
+            underlayColor="#727272"
+            className={classMerge(
+              'bg-neutral-400 justify-center items-center rounded-md py-2 mt-6',
+              formHasErrors && 'mt-1',
+            )}
+            onPress={handleSubmit(onSubmit)}>
+            <Text className="uppercase text-white">Continue</Text>
+          </TouchableHighlight>
+        </View>
       </View>
     </View>
   );

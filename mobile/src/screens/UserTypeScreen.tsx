@@ -56,7 +56,7 @@ const UserTypeScreen = ({navigation}: ScreenProps<'UserType'>) => {
 
   const confirmUserType = async () => {
     await updateOwnUser({type: userType});
-    navigation.navigate('Home');
+    navigation.navigate('CreateField');
   };
 
   return (

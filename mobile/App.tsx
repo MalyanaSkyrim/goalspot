@@ -4,6 +4,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {httpBatchLink} from '@trpc/client';
 
 import {SERVER_URL} from '@env';
+import {NativeBaseProvider} from 'native-base';
 import React, {useState} from 'react';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import Navigator from './src/components/Navigator';
@@ -42,7 +43,9 @@ function App(): JSX.Element {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <Navigator />
+        <NativeBaseProvider>
+          <Navigator />
+        </NativeBaseProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

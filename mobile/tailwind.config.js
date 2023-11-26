@@ -1,9 +1,15 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: ['./App.tsx', './src/**/*.tsx'],
+
   theme: {
+    fontFamily: {
+      Lato: ['Lato'],
+    },
     extend: {
       colors: {
+        primary: '#9acd32',
         danger: {
           DEFAULT: '#DA2E2E',
           50: '#F6CACA',

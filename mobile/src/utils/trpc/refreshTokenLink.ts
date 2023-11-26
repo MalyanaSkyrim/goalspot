@@ -5,7 +5,7 @@ import type {AnyRouter} from '@trpc/server';
 import type {Unsubscribable} from '@trpc/server/observable';
 import {observable} from '@trpc/server/observable';
 import EncryptedStorage from 'react-native-encrypted-storage';
-import {AppRouter} from '../../../../server/src/modules';
+import type {AppRouter} from 'server/src/modules';
 
 const trpcProxyClient = createTRPCProxyClient<AppRouter>({
   links: [

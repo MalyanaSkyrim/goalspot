@@ -1,13 +1,13 @@
 import React from 'react';
 import {Control, Controller, Path} from 'react-hook-form';
-import {Text, View} from 'react-native';
+import {StyleProp, Text, View, ViewStyle} from 'react-native';
 import PhoneInput, {PhoneInputProps} from 'react-native-phone-number-input';
-import classMerge from '../../utils/classMerge';
 
 interface FormInputProps<TData extends Record<string, unknown>>
   extends PhoneInputProps {
   control: Control<TData>;
   name: Path<TData>;
+  style?: StyleProp<ViewStyle>;
 }
 
 const FormPhoneInput = <
@@ -16,12 +16,13 @@ const FormPhoneInput = <
   control,
   name,
   placeholder,
+  style,
 }: FormInputProps<TData>) => {
   return (
     <Controller
       control={control}
       render={({field, fieldState}) => (
-        <View className={classMerge('mb-3', fieldState.error && 'mb-[2px]')}>
+        <View style={style}>
           <PhoneInput
             defaultCode="MA"
             onChangeFormattedText={field.onChange}
