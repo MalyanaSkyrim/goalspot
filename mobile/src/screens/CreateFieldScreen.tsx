@@ -1,8 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {CreateFieldInput} from 'server/src/modules/field/field.schema';
 import FieldForm from '../components/FieldForm';
+import {ScreenProps} from '../types/navigation';
 import TextField from '../ui/Form/TextField';
 import trpc from '../utils/trpc';
 
@@ -15,11 +17,13 @@ import trpc from '../utils/trpc';
 //   label: currency,
 // }));
 
-const CreateFieldScreen = () => {
+const CreateFieldScreen = ({navigation}: ScreenProps<'CreateField'>) => {
   const {mutateAsync: createField} = trpc.field.createField.useMutation();
 
   const onSubmit = async (values: CreateFieldInput) => {
-    await createField(values);
+    const field = await createField(values);
+    AsyncStorage.setItem('fieldId', field.id);
+    navigation.navigate('EditFieldImages');
   };
 
   return (

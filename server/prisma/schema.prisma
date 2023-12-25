@@ -66,16 +66,17 @@ model PitchLocation {
 
 model PitchImage {
   id        String   @id @default(uuid())
-  url       String
-  pitchId   String
-  pitch     Pitch   @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  url       String   
+  pitchId   String   
+  index     Int      @unique @default(0)
+  pitch     Pitch    @relation(fields: [pitchId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {
   id        String   @id @default(uuid())
   date      DateTime
   duration  Int     //Hours
-  weekly    Boolean //default false
+  weekly    Boolean @default(false)
   userId    String
   pitchId   String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
