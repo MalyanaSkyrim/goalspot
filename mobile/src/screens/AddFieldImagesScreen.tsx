@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Spinner} from 'native-base';
 import React, {useEffect, useMemo, useState} from 'react';
 import {Image, TouchableHighlight, TouchableOpacity, View} from 'react-native';
@@ -7,13 +6,14 @@ import ImageCropPicker, {
 } from 'react-native-image-crop-picker';
 import IOIcon from 'react-native-vector-icons/Ionicons';
 import MLIcon from 'react-native-vector-icons/MaterialIcons';
+import {ScreenProps} from '../types/navigation';
 import TextField from '../ui/Form/TextField';
 import classMerge from '../utils/classMerge';
 import trpc from '../utils/trpc';
 
 const TOTAL_IMAGES = 3;
 
-type ImageData = {index: number; data?: ImageMedia; url?: string};
+type ImageData = {id?: string; index: number; data?: ImageMedia; url?: string};
 
 const parseImages = (images: ImageData[]) => {
   const parsedImages: {index: number; mime: string; base64: string}[] = [];
@@ -31,41 +31,73 @@ const parseImages = (images: ImageData[]) => {
   return parsedImages;
 };
 
-const EditFieldImagesScreen = () => {
-  const [fieldId, setFieldId] = useState<string | null>(null);
+const AddFieldImagesScreen = ({
+  navigation,
+  route,
+}: ScreenProps<'AddFieldImages'>) => {
+  const fieldId =
+    route.params?.fieldId ?? 'b33a9a1e-997f-44c4-bb64-bd72468af6a0';
 
-  const {data: fieldImages = []} = trpc.field.getFieldImages.useQuery(
-    {fieldId: fieldId as string},
-    {
-      enabled: !!fieldId,
-    },
-  );
-
-  const savedImages = useMemo(
-    () =>
-      fieldImages.map(image => ({
-        index: image.index,
-        url: image.url,
-      })),
-    [fieldImages],
-  );
+  const {data: fieldImages = [], isLoading} =
+    trpc.field.getFieldImages.useQuery(
+      {fieldId: fieldId as string},
+      {
+        enabled: !!fieldId,
+      },
+    );
 
   const [images, setImages] = useState<ImageData[]>(
     [...Array(TOTAL_IMAGES)].map((_, index) => ({index})),
   );
 
-  const isLoading = false;
+  useEffect(() => {
+    if (isLoading) return;
+    const savedImages = fieldImages.map(image => ({
+      id: image.id,
+      index: image.index,
+      url: image.url,
+    }));
 
-  const canSubmit = !isLoading && images.length > 0;
+    const imagesList = images
+      .map(image => {
+        const savedImage = savedImages.find(img => img.index === image.index);
+        return savedImage ?? image;
+      })
+      .sort((a, b) => a.index - b.index);
 
-  const {mutate: addFieldImages} = trpc.field.addFieldImages.useMutation();
+    setImages(imagesList);
+  }, [isLoading]);
+
+  const [imagesIndexesToRemove, setImagesIndexesToRemove] = useState<number[]>(
+    [],
+  );
+
+  const parsedImages = useMemo(() => parseImages(images), [images]);
+
+  const canSubmit =
+    !isLoading && (parsedImages.length > 0 || imagesIndexesToRemove.length > 0);
+
+  const {mutateAsync: addFieldImages, isLoading: isAddingImages} =
+    trpc.field.addFieldImages.useMutation();
+  const {mutateAsync: removeFieldImages, isLoading: isRemovingImages} =
+    trpc.field.removeFieldImages.useMutation();
+
+  const isSubmitting = isAddingImages || isRemovingImages;
 
   const handleSubmit = async () => {
     if (!fieldId) return;
-    addFieldImages({
+
+    await removeFieldImages({
+      fieldId,
+      indexes: imagesIndexesToRemove,
+    });
+
+    await addFieldImages({
       fieldId,
       images: parseImages(images),
     });
+
+    navigation.navigate('ManageFieldsScreen');
   };
 
   const handleAddImage = (index: number) => {
@@ -82,27 +114,12 @@ const EditFieldImagesScreen = () => {
 
   const handleRemoveImage = (index: number) => {
     const updatedImages = [...images];
+    const imageToRemove = updatedImages[index];
+    if (imageToRemove.id)
+      setImagesIndexesToRemove([...imagesIndexesToRemove, imageToRemove.index]);
     updatedImages.splice(index, 1, {index});
     setImages(updatedImages);
   };
-
-  useEffect(() => {
-    AsyncStorage.getItem('fieldId').then(id => setFieldId(id));
-  }, []);
-
-  const imagesList = useMemo(
-    () =>
-      images
-        .map(image => {
-          const savedImage = savedImages.find(img => img.index === image.index);
-          return {
-            ...image,
-            url: savedImage?.url,
-          };
-        })
-        .sort((a, b) => a.index - b.index),
-    [images, savedImages],
-  );
 
   return (
     <View className="flex-1 space-y-4 p-5">
@@ -112,12 +129,12 @@ const EditFieldImagesScreen = () => {
         </TextField>
         <TextField className="text-base">
           Choose vibrant and clear images that showcase the football pitch from
-          different angles.
+          different angles. yh§gh
         </TextField>
       </View>
       <View className="flex-1 justify-between">
         <View className="flex-1 space-y-3">
-          {imagesList.map(image => (
+          {images.map(image => (
             <View
               key={image.index}
               className="relative border flex-1 rounded-md border-neutral-300 bg-neutral-200 overflow-hidden"
@@ -181,12 +198,12 @@ const EditFieldImagesScreen = () => {
           disabled={!canSubmit}
           underlayColor="#6b8f22"
           className={classMerge(
-            'bg-primary justify-center items-center rounded-md py-2 mt-6',
+            'bg-primary justify-center items-center rounded-md py-2 mt-6 h-8',
             !canSubmit && 'bg-primary/50',
           )}
           onPress={handleSubmit}>
           <View className="flex-row space-x-2">
-            {isLoading && <Spinner color="white" size={18} />}
+            {isSubmitting && <Spinner color="white" size={18} />}
             <TextField className="uppercase text-white">Continue</TextField>
           </View>
         </TouchableHighlight>
@@ -195,4 +212,4 @@ const EditFieldImagesScreen = () => {
   );
 };
 
-export default EditFieldImagesScreen;
+export default AddFieldImagesScreen;

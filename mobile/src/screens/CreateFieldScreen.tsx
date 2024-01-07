@@ -1,7 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {CreateFieldInput} from 'server/src/modules/field/field.schema';
 import FieldForm from '../components/FieldForm';
 import {ScreenProps} from '../types/navigation';
@@ -22,8 +21,7 @@ const CreateFieldScreen = ({navigation}: ScreenProps<'CreateField'>) => {
 
   const onSubmit = async (values: CreateFieldInput) => {
     const field = await createField(values);
-    AsyncStorage.setItem('fieldId', field.id);
-    navigation.navigate('EditFieldImages');
+    navigation.navigate('AddFieldImages', {fieldId: field.id});
   };
 
   return (
@@ -31,7 +29,6 @@ const CreateFieldScreen = ({navigation}: ScreenProps<'CreateField'>) => {
       <TextField className="text-2xl text-[#7ba428]">
         Create your football field
       </TextField>
-      {/* <ImagesCarouselEditor slides={slides} onChange={handleSlidesChange} /> */}
       <FieldForm onSubmit={onSubmit} />
     </View>
   );

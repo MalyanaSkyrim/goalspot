@@ -17,6 +17,11 @@ export const getUser = ({
       type: true,
       phone: true,
       email: true,
+      pitches: {
+        include: {
+          images: true,
+        },
+      },
     },
   });
 };

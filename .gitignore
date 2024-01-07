@@ -61,6 +61,7 @@ mobile/vendor/bundle/
 
 # Temporary files created by Metro to check the health of the file watcher
 mobile/.metro-health-check*
+mobile/cockroach-data
 
 # testing
 **/coverage

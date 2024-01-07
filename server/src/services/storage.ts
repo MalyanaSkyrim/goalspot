@@ -46,6 +46,18 @@ const getImageExtension = (mime: string) => {
   return imageMimeExtensions[mime as ImageMime] ?? ".jpg";
 };
 
+const getImageByIndex = async (
+  bucketName: string,
+  fieldId: string,
+  index: string
+) => {
+  const [files] = await storage.bucket(bucketName).getFiles({
+    prefix: `${fieldId}`,
+  });
+
+  return files.find((file) => file.metadata.metadata?.index === index);
+};
+
 export const uploadImage = async (
   image: AddFieldImagesInput["images"][0],
   fieldId: string
@@ -89,14 +101,13 @@ export const uploadImage = async (
   return file.publicUrl();
 };
 
-const getImageByIndex = async (
-  bucketName: string,
-  fieldId: string,
-  index: string
-) => {
-  const [files] = await storage.bucket(bucketName).getFiles({
-    prefix: `${fieldId}`,
-  });
+export const removeImage = async (fieldId: string, index: string) => {
+  const bucket = storage.bucket(bucketName);
 
-  return files.find((file) => file.metadata.metadata?.index === index);
+  const file = await getImageByIndex(bucketName, fieldId, index);
+
+  if (file) {
+    await file.delete();
+    console.log(`${file.name} deleted from ${bucketName}.`);
+  }
 };

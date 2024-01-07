@@ -7,7 +7,8 @@ export type RootStackParamList = {
   PhoneEdit: {phoneNumber: string};
   CreateField: undefined;
   Loading: undefined;
-  EditFieldImages: undefined;
+  AddFieldImages: {fieldId: string};
+  ManageFieldsScreen: undefined;
 };
 
 export type ScreenProps<Route extends keyof RootStackParamList> =

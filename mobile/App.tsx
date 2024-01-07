@@ -31,15 +31,6 @@ function App(): JSX.Element {
     }),
   );
 
-  /**
-   * Dev only
-   * To clear auth state
-   */
-  // useEffect(() => {
-  //   EncryptedStorage.removeItem('accessToken');
-  //   EncryptedStorage.removeItem('refreshToken');
-  // }, []);
-
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>

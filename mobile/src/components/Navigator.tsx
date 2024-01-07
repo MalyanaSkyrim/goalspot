@@ -8,8 +8,10 @@ import {isAuthenticatedAtom, userAtom} from '../jotai/atoms';
 import AuthScreen from '../screens/AuthScreen';
 
 import CreateFieldScreen from '../screens/CreateFieldScreen';
-import EditFieldImagesScreen from '../screens/EditFieldImagesScreen';
+
+import AddFieldImagesScreen from '../screens/AddFieldImagesScreen';
 import {LoadingScreen} from '../screens/LoadingScreen';
+import ManageFieldsScreen from '../screens/ManageFieldsScreen';
 import OTPScreen from '../screens/OTPScreen';
 import PhoneNumberEditScreen from '../screens/PhoneNumberEditScreen';
 import UserTypeScreen from '../screens/UserTypeScreen';
@@ -22,8 +24,10 @@ const Navigator = () => {
   const [user, setUser] = useAtom(userAtom);
   const [userId, setUserId] = useState<string>();
 
+  console.log('sky', {user, userId, enabled: !!(userId && !user)});
+
   const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
-  const {data: userData, isLoading} = trpc.user.getUser.useQuery(
+  const {data: userData, isFetching} = trpc.user.getUser.useQuery(
     {
       id: userId!,
     },
@@ -45,10 +49,6 @@ const Navigator = () => {
   }, [isAuthenticated, userData]);
 
   useEffect(() => {
-    //DevOnly: to clear storage
-    // EncryptedStorage.clear();
-    // AsyncStorage.clear();
-
     initUserId();
   }, []);
 
@@ -62,7 +62,9 @@ const Navigator = () => {
         screenOptions={{
           header: () => null,
         }}>
-        {isLoading && <Stack.Screen name="Loading" component={LoadingScreen} />}
+        {isFetching && (
+          <Stack.Screen name="Loading" component={LoadingScreen} />
+        )}
         {isAuthenticated && user ? (
           <>
             {!user.active && (
@@ -77,11 +79,23 @@ const Navigator = () => {
             {!user.type && (
               <Stack.Screen name="UserType" component={UserTypeScreen} />
             )}
+
+            {user.pitches.length > 1 && (
+              <>
+                <Stack.Screen
+                  name="CreateField"
+                  component={CreateFieldScreen}
+                />
+                <Stack.Screen
+                  name="AddFieldImages"
+                  component={AddFieldImagesScreen}
+                />
+              </>
+            )}
             <Stack.Screen
-              name="EditFieldImages"
-              component={EditFieldImagesScreen}
+              name="ManageFieldsScreen"
+              component={ManageFieldsScreen}
             />
-            <Stack.Screen name="CreateField" component={CreateFieldScreen} />
           </>
         ) : (
           <Stack.Screen name="Auth" component={AuthScreen} />

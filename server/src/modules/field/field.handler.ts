@@ -1,9 +1,10 @@
-import { uploadImage } from "../../services/storage";
+import { removeImage, uploadImage } from "../../services/storage";
 import { Context } from "../../trpc/context";
 import {
   AddFieldImagesInput,
   CreateFieldInput,
   FieldIdInput,
+  RemoveFieldImagesInput,
 } from "./field.schema";
 
 export const createField = ({
@@ -47,4 +48,22 @@ export const getFieldImages = async ({
     where: { pitchId: input.fieldId },
   });
   return images;
+};
+
+export const removeFieldImages = async ({
+  ctx,
+  input,
+}: {
+  ctx: Context;
+  input: RemoveFieldImagesInput;
+}) => {
+  const { fieldId, indexes } = input;
+
+  indexes.forEach(async (index) => {
+    await removeImage(fieldId, index.toString());
+  });
+
+  await ctx.db.pitchImage.deleteMany({
+    where: { index: { in: indexes } },
+  });
 };

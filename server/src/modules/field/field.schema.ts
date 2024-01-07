@@ -27,6 +27,12 @@ export const fieldIdSchema = z.object({
   fieldId: z.string().uuid(),
 });
 
+export const removeFieldImagesSchema = z.object({
+  fieldId: z.string().uuid(),
+  indexes: z.array(z.number()),
+});
+
 export type CreateFieldInput = z.infer<typeof createFieldSchema>;
 export type AddFieldImagesInput = z.infer<typeof addFieldImagesSchema>;
 export type FieldIdInput = z.infer<typeof fieldIdSchema>;
+export type RemoveFieldImagesInput = z.infer<typeof removeFieldImagesSchema>;
